@@ -333,6 +333,11 @@ end
 
                     one = ESML.solve(doc; system = "S", binary = bin)
                     @test one.values["m.x"] ≈ 0.0 atol = 1e-8
+                    @test one.meta["converged"] == true
+                    @test one.meta["docHash"] isa AbstractString
+                    @test length(one.meta["docHash"]) == 64
+                    @test one.meta["unitCoverage"]["total"] == 1
+                    @test isempty(one.units)
                     oneshot = ESML.simulate(
                         doc,
                         (0.0, 1.0),
@@ -343,6 +348,8 @@ end
                     )
                     @test oneshot.series["m.x"][1] ≈ 1.0
                     @test oneshot.steps == 10
+                    @test oneshot.meta["engineVersion"] == one.meta["engineVersion"]
+                    @test isempty(oneshot.units)
                 finally
                     close!(session)
                 end

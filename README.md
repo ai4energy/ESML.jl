@@ -16,9 +16,10 @@ using ESML
 
 steady = solve("plant.esml"; system = "Plant")
 println(steady.values)
+println(get(steady.units, "tank.T", nothing), " ", steady.meta["unitCoverage"])
 
 traj = simulate("plant.esml", (0.0, 60.0), 60; observe = ["tank.T"])
-println(traj.series["tank.T"][end])
+println(traj.series["tank.T"][end], " ", get(traj.units, "tank.T", nothing))
 ```
 
 ## 安装
@@ -41,8 +42,12 @@ Pkg.add(url = "https://github.com/ai4energy/ESML.jl")
 
 | 调用 | 含义 |
 | --- | --- |
-| `solve(path; system=nothing, libraries=String[], binary=nothing, timeout=120.0)` | 稳态求解 → `SolveOutput(values, unknowns, system, raw)` |
-| `simulate(path, tspan=(0.0, 1.0), steps=100; observe=nothing, …)` | 一次性时间积分 → `SimulateOutput(t, series, steps, system, raw)` |
+| `solve(path; system=nothing, libraries=String[], binary=nothing, timeout=120.0)` | 稳态求解 → `SolveOutput(values, unknowns, system, raw, units, meta)` |
+| `simulate(path, tspan=(0.0, 1.0), steps=100; observe=nothing, …)` | 一次性时间积分 → `SimulateOutput(t, series, steps, system, raw, units, meta)` |
+
+`units` 是路径 → SI 量纲表达式的映射（模型未声明单位时缺项）；`meta` 含
+`engineVersion`、`docHash`（源文件 SHA-256）、`durationMs`、`converged` 与
+`unitCoverage`。字段语义见[结果契约](https://docs.ai4energy.cn/esml/results)。
 
 `observe` 只接受变量路径；空列表在客户端拒绝，未知/重复路径由引擎拒绝。
 

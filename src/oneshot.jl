@@ -12,6 +12,8 @@ struct SolveOutput
     unknowns::Union{Nothing,Int}
     system::Union{Nothing,String}
     raw::Dict{String,Any}
+    units::Dict{String,String}
+    meta::Dict{String,Any}
 end
 
 struct SimulateOutput
@@ -20,6 +22,8 @@ struct SimulateOutput
     steps::Int
     system::Union{Nothing,String}
     raw::Dict{String,Any}
+    units::Dict{String,String}
+    meta::Dict{String,Any}
 end
 
 """
@@ -38,12 +42,25 @@ function solve(
     push!(args, "--json")
     env = _run_cli(args, "esml.solve/v1", timeout, "solve")
     values = Dict{String,Float64}()
+    units = Dict{String,String}()
     for row in _array(env, "values")
         row isa AbstractDict ||
             throw(protocol_error("protocol: `values` entry is not an object"))
-        values[String(row["path"])] = _as_float(row["value"], "values[].value")
+        path = String(row["path"])
+        values[path] = _as_float(row["value"], "values[].value")
+        unit = get(row, "unit", nothing)
+        unit === nothing || (units[path] = String(unit))
     end
-    return SolveOutput(values, _to_int(_field(env, "unknowns")), _maybe_string(_field(env, "system")), env)
+    meta = _field(env, "meta", Dict{String,Any}())
+    meta isa AbstractDict || throw(protocol_error("protocol: `meta` is not an object"; env = env))
+    return SolveOutput(
+        values,
+        _to_int(_field(env, "unknowns")),
+        _maybe_string(_field(env, "system")),
+        env,
+        units,
+        Dict{String,Any}(String(k) => plain(v) for (k, v) in pairs(meta)),
+    )
 end
 
 """
@@ -81,7 +98,21 @@ function simulate(
     steps_out = _to_int(_field(env, "steps"))
     steps_out === nothing &&
         throw(protocol_error("protocol: `steps` is missing or not an integer"; env = env))
-    return SimulateOutput(t, series, steps_out, _maybe_string(_field(env, "system")), env)
+    raw_units = _field(env, "units", Dict{String,Any}())
+    raw_units isa AbstractDict ||
+        throw(protocol_error("protocol: `units` is not an object"; env = env))
+    units = Dict{String,String}(String(k) => String(v) for (k, v) in pairs(raw_units))
+    meta = _field(env, "meta", Dict{String,Any}())
+    meta isa AbstractDict || throw(protocol_error("protocol: `meta` is not an object"; env = env))
+    return SimulateOutput(
+        t,
+        series,
+        steps_out,
+        _maybe_string(_field(env, "system")),
+        env,
+        units,
+        Dict{String,Any}(String(k) => plain(v) for (k, v) in pairs(meta)),
+    )
 end
 
 _maybe_string(value) = value isa AbstractString ? String(value) : nothing
