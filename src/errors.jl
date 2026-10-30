@@ -20,6 +20,12 @@ struct EsmlError <: Exception
     op::Union{Nothing,String}
     request::Union{Nothing,String}
     raw::Any
+    #: Stable code from `esml.error/v1` (nothing for client-side errors).
+    code::Union{Nothing,String}
+    #: Actionable engine suggestion, when available.
+    hint::Union{Nothing,String}
+    #: SHA-256 of the source document, when available.
+    doc_hash::Union{Nothing,String}
 end
 
 function EsmlError(
@@ -28,6 +34,9 @@ function EsmlError(
     op = nothing,
     request = nothing,
     raw = nothing,
+    code = nothing,
+    hint = nothing,
+    doc_hash = nothing,
 )
     kind in ERROR_KINDS ||
         throw(ArgumentError("unknown EsmlError kind $(repr(kind))"))
@@ -37,6 +46,9 @@ function EsmlError(
         op === nothing ? nothing : String(op),
         request === nothing ? nothing : String(request),
         raw,
+        code === nothing ? nothing : String(code),
+        hint === nothing ? nothing : String(hint),
+        doc_hash === nothing ? nothing : String(doc_hash),
     )
 end
 

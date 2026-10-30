@@ -295,6 +295,17 @@ end
                     @test session.doc_hash !== nothing
                     @test session.unknowns >= 1
 
+                    err = caught(
+                        () -> ESML.solve(
+                            "/tmp/esml-missing-for-client.esml";
+                            binary = bin,
+                        ),
+                    )
+                    @test err isa EsmlError
+                    @test err.code == "io.read"
+                    @test err.hint !== nothing
+                    @test err.doc_hash === nothing
+
                     traj = simulate(session, (0.0, 1.0), 20; observe = ["m.x"])
                     @test traj.points == 21
                     @test collect(keys(traj.series)) == ["m.x"]
@@ -323,6 +334,8 @@ end
 
                     clear_state!(session)
                     first = simulate(session, (0.0, 1.0), 10; observe = ["m.x"])
+                    @test first.meta["engineVersion"] isa AbstractString
+                    @test isempty(first.units)
                     p = predict(session, 0.5, 5; observe = ["m.x"])
                     @test p.continued === true
                     @test p.t[1] == 0.0
@@ -331,12 +344,22 @@ end
                     @test chained.continued === true
                     @test chained.series["m.x"][1] ≈ first.series["m.x"][end] rtol = 1e-6
 
+                    sres = solve(session)
+                    @test sres.meta["converged"] == true
+                    @test sres.meta["engineVersion"] isa AbstractString
+                    @test sres.meta["docHash"] isa AbstractString
+                    @test isempty(sres.units)
+                    @test sres.iterations !== nothing
+                    @test sres.meta["residual"] <= sres.meta["residualTolerance"]
+
                     one = ESML.solve(doc; system = "S", binary = bin)
                     @test one.values["m.x"] ≈ 0.0 atol = 1e-8
                     @test one.meta["converged"] == true
                     @test one.meta["docHash"] isa AbstractString
                     @test length(one.meta["docHash"]) == 64
                     @test one.meta["unitCoverage"]["total"] == 1
+                    @test one.meta["iterations"] >= 1
+                    @test one.meta["residual"] <= one.meta["residualTolerance"]
                     @test isempty(one.units)
                     oneshot = ESML.simulate(
                         doc,

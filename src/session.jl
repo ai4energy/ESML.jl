@@ -18,6 +18,8 @@ struct SolveResult
     duration_ms::Union{Nothing,Int}
     doc_hash::Any
     raw::Dict{String,Any}
+    units::Dict{String,String}
+    meta::Dict{String,Any}
 end
 
 """Result of [`simulate`](@ref) / [`predict`](@ref)."""
@@ -30,6 +32,8 @@ struct Trajectory
     duration_ms::Union{Nothing,Int}
     doc_hash::Any
     raw::Dict{String,Any}
+    units::Dict{String,String}
+    meta::Dict{String,Any}
 end
 
 """Result of [`info`](@ref) (a session status snapshot)."""
@@ -45,6 +49,8 @@ struct Info
     sim_calls::Union{Nothing,Int}
     last_steps::Union{Nothing,Int}
     raw::Dict{String,Any}
+    source_hash::Union{Nothing,String}
+    engine_version::Union{Nothing,String}
 end
 
 # ── session ────────────────────────────────────────────────────────────────
@@ -68,6 +74,7 @@ mutable struct Session
     binary::String
     engine_version::Union{Nothing,String}
     doc_hash::Any
+    source_hash::Union{Nothing,String}
     system::Any
     unknowns::Union{Nothing,Int}
     dynamic::Union{Nothing,Bool}
@@ -130,6 +137,7 @@ function Session(
         nothing,
         nothing,
         nothing,
+        nothing,
         proc,
         err_path,
         timeout === nothing ? nothing : Float64(timeout),
@@ -160,6 +168,8 @@ function Session(
                 op = "open",
                 request = _field(env, "request"),
                 raw = env,
+                code = _maybe_string(_field(env, "code")),
+                hint = _maybe_string(_field(env, "hint")),
             ),
         )
     end
@@ -174,6 +184,7 @@ function Session(
         )
     end
     session.doc_hash = _field(env, "docHash")
+    session.source_hash = _maybe_string(_field(env, "sourceHash"))
     session.system = _field(env, "system")
     session.unknowns = _to_int(_field(env, "unknowns"))
     session.dynamic = _to_bool(_field(env, "dynamic"))
@@ -200,6 +211,8 @@ function solve(session::Session)
         _to_int(_field(env, "durationMs")),
         _field(env, "docHash"),
         env,
+        _unit_dict(_field(env, "units", Dict{String,Any}())),
+        _meta_dict(_field(env, "meta", Dict{String,Any}())),
     )
 end
 
@@ -314,6 +327,8 @@ function info(session::Session)
         _to_int(_field(env, "simCalls")),
         _to_int(_field(env, "lastSteps")),
         env,
+        _maybe_string(_field(env, "sourceHash")),
+        _maybe_string(_field(env, "engineVersion")),
     )
 end
 
@@ -471,6 +486,9 @@ function request(session::Session, op::AbstractString; fields...)
                     op = op,
                     request = _field(env, "request"),
                     raw = env,
+                    code = _maybe_string(_field(env, "code")),
+                    hint = _maybe_string(_field(env, "hint")),
+                    doc_hash = session.source_hash,
                 ),
             )
         end
@@ -623,5 +641,14 @@ function _trajectory(env::Dict{String,Any})
         _to_int(_field(env, "durationMs")),
         _field(env, "docHash"),
         env,
+        _unit_dict(_field(env, "units", Dict{String,Any}())),
+        _meta_dict(_field(env, "meta", Dict{String,Any}())),
     )
 end
+
+_unit_dict(v) =
+    v isa AbstractDict ? Dict{String,String}(String(k) => String(x) for (k, x) in pairs(v)) :
+    Dict{String,String}()
+_meta_dict(v) =
+    v isa AbstractDict ? Dict{String,Any}(String(k) => plain(x) for (k, x) in pairs(v)) :
+    Dict{String,Any}()

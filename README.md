@@ -46,8 +46,9 @@ Pkg.add(url = "https://github.com/ai4energy/ESML.jl")
 | `simulate(path, tspan=(0.0, 1.0), steps=100; observe=nothing, …)` | 一次性时间积分 → `SimulateOutput(t, series, steps, system, raw, units, meta)` |
 
 `units` 是路径 → SI 量纲表达式的映射（模型未声明单位时缺项）；`meta` 含
-`engineVersion`、`docHash`（源文件 SHA-256）、`durationMs`、`converged` 与
-`unitCoverage`。字段语义见[结果契约](https://docs.ai4energy.cn/esml/results)。
+`engineVersion`、`docHash`（源文件 SHA-256）、`durationMs`、`converged`、
+`iterations`、`residual`、`residualTolerance` 与 `unitCoverage`。字段语义见
+[结果契约](https://docs.ai4energy.cn/esml/results)。
 
 `observe` 只接受变量路径；空列表在客户端拒绝，未知/重复路径由引擎拒绝。
 
@@ -59,6 +60,10 @@ Pkg.add(url = "https://github.com/ai4energy/ESML.jl")
 | `solve(session)` / `simulate(session, tspan, steps; observe)` / `predict(session, horizon, …)` | 求解、链式积分、非推进预测 |
 | `set_param!` / `set_params!` / `set_state!` / `set_states!` / `clear_state!` | 热参数与状态注入 |
 | `snapshot` / `restore!` / `info` / `close!` | 快照恢复、状态与生命周期 |
+
+`SolveResult` / `Trajectory` 含 `units` 与 `meta`，字段与一次性契约一致。
+
+`EsmlError` 还带 `code` / `hint` / `doc_hash`（来自 `esml.error/v1`）。
 
 失败抛 `EsmlError`，`kind` 区分 `:engine` / `:protocol` / `:timeout` / `:closed` /
 `:binary_not_found`；客户端参数错误抛 `ArgumentError`。

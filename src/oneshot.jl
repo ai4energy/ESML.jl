@@ -152,7 +152,33 @@ function _run_cli(args, api, timeout, op)
         err = strip(read(err_path, String))
         if !success(proc)
             message = isempty(err) ? "`esml $(op)` exited with code $(proc.exitcode)" : err
-            throw(EsmlError(message; kind = :engine, op = op))
+            code = hint = doc_hash = nothing
+            lines = split(message, '\n'; keepempty = false)
+            if !isempty(lines)
+                parsed = try
+                    JSON3.read(lines[end])
+                catch
+                    nothing
+                end
+                if parsed !== nothing &&
+                   get(parsed, "apiVersion", nothing) == "esml.error/v1"
+                    code = _maybe_string(get(parsed, "code", nothing))
+                    hint = _maybe_string(get(parsed, "hint", nothing))
+                    doc_hash = _maybe_string(get(parsed, "docHash", nothing))
+                    message = join(lines[1:(end - 1)], "\n")
+                end
+            end
+            startswith(message, "error: ") && (message = message[8:end])
+            throw(
+                EsmlError(
+                    message;
+                    kind = :engine,
+                    op = op,
+                    code = code,
+                    hint = hint,
+                    doc_hash = doc_hash,
+                ),
+            )
         end
         text = read(out_path, String)
         parsed = try
