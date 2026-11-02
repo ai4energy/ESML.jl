@@ -1,5 +1,5 @@
 using Test
-using ESML
+using ESMLKit
 
 const FAKE = joinpath(@__DIR__, "fake_esml.jl")
 const ROOT = dirname(@__DIR__)
@@ -39,7 +39,7 @@ function with_session(f; mode = "ok", timeout = 5.0)
     end
 end
 
-@testset "ESML.jl" begin
+@testset "ESMLKit.jl" begin
     @testset "open envelope" begin
         with_session() do s
             @test s.doc_hash == 42
@@ -285,7 +285,7 @@ end
     # ── real engine (opt-in) ─────────────────────────────────────────────
     let bin = get(ENV, "ESML_BIN", nothing)
         if bin === nothing
-            @info "ESML.jl: integration tests skipped — set ESML_BIN to a real `esml` binary"
+            @info "ESMLKit.jl: integration tests skipped — set ESML_BIN to a real `esml` binary"
         else
             doc = joinpath(@__DIR__, "decay.esml")
             @testset "real engine" begin
@@ -296,7 +296,7 @@ end
                     @test session.unknowns >= 1
 
                     err = caught(
-                        () -> ESML.solve(
+                        () -> ESMLKit.solve(
                             "/tmp/esml-missing-for-client.esml";
                             binary = bin,
                         ),
@@ -352,7 +352,7 @@ end
                     @test sres.iterations !== nothing
                     @test sres.meta["residual"] <= sres.meta["residualTolerance"]
 
-                    one = ESML.solve(doc; system = "S", binary = bin)
+                    one = ESMLKit.solve(doc; system = "S", binary = bin)
                     @test one.values["m.x"] ≈ 0.0 atol = 1e-8
                     @test one.meta["converged"] == true
                     @test one.meta["docHash"] isa AbstractString
@@ -361,7 +361,7 @@ end
                     @test one.meta["iterations"] >= 1
                     @test one.meta["residual"] <= one.meta["residualTolerance"]
                     @test isempty(one.units)
-                    oneshot = ESML.simulate(
+                    oneshot = ESMLKit.simulate(
                         doc,
                         (0.0, 1.0),
                         10;

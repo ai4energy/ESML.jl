@@ -1,7 +1,7 @@
 """Errors raised by the ESML Julia client.
 
 A single exception type with a `kind` field keeps `catch err; err isa
-ESML.EsmlError` sufficient at every call site while still distinguishing the
+ESMLKit.EsmlError` sufficient at every call site while still distinguishing the
 failure classes:
 
 * `:engine`            — the engine reported an error envelope

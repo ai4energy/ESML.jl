@@ -1,4 +1,4 @@
-<!-- Example for the ESML Python client (MIT). Der(x) = -lam * x. -->
+<!-- Example for the ESMLKit Julia client (MIT). Der(x) = -lam * x. -->
 <esml xmlns="https://www.ai4energy.cn/esml/v1" name="Decay">
   <variableTypes><type name="real" unit="1" default="0"/></variableTypes>
   <modelTypes><modelType name="Decay">

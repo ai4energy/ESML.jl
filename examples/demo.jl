@@ -5,7 +5,7 @@ Run with the engine on PATH (or ``ESML_BIN=/path/to/esml``)::
     julia --project=. examples/demo.jl
 """
 
-using ESML
+using ESMLKit
 
 doc = joinpath(@__DIR__, "decay.esml")
 

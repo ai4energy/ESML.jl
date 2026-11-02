@@ -1,6 +1,7 @@
-# ESML.jl
+# ESMLKit.jl
 
-ESML 引擎的 **MIT** Julia 客户端。公开面是**一次性调用**：`solve` / `simulate`
+ESML 引擎的 **MIT** Julia 客户端。包名从 `ESML` 迁移为 `ESMLKit`，
+以满足 Julia General 的包名长度要求；UUID 保持不变。公开面是**一次性调用**：`solve` / `simulate`
 每次启动一个 `esml` 进程，读取 `esml.solve/v1` / `esml.simulate/v1` JSON，
 调用之间不保留状态。
 
@@ -12,7 +13,7 @@ ESML 引擎的 **MIT** Julia 客户端。公开面是**一次性调用**：`solv
 与本包是两件独立的东西。
 
 ```julia
-using ESML
+using ESMLKit
 
 steady = solve("plant.esml"; system = "Plant")
 println(steady.values)
@@ -26,7 +27,7 @@ println(traj.series["tank.T"][end], " ", get(traj.units, "tank.T", nothing))
 
 ```julia
 using Pkg
-Pkg.add(url = "https://github.com/ai4energy/ESML.jl")
+Pkg.add(url = "https://github.com/ai4energy/ESMLKit.jl")
 ```
 
 还需要**引擎二进制**：

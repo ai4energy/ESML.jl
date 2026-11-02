@@ -1,11 +1,11 @@
-"""ESML.jl — MIT Julia client for the ESML engine.
+"""ESMLKit.jl — MIT Julia client for the ESML engine.
 
 The engine (`esml`) is a native binary distributed separately under its own
 license; this package only launches it and speaks the `esml.session/v1` JSON
 protocol over stdin/stdout. No engine code is linked or embedded.
 """
 
-module ESML
+module ESMLKit
 
 using JSON3
 

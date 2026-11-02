@@ -1,7 +1,7 @@
-name = "ESML"
+name = "ESMLKit"
 uuid = "6fa1d99e-4a66-4af0-9128-1d23b8695e9c"
 authors = ["Mingtao Li <mingtao.li@gmail.com>"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"

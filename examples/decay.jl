@@ -3,7 +3,7 @@
 #     export ESML_BIN=/path/to/esml
 #     julia --project=. examples/decay.jl
 
-using ESML
+using ESMLKit
 
 doc = joinpath(@__DIR__, "decay.esml")
 
