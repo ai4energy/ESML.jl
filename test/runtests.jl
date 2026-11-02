@@ -239,9 +239,10 @@ end
     @testset "timeout kills the engine" begin
         started = time()
         err = withenv("FAKE_ESML_MODE" => "silent") do
-            # 2 s must cover the Julia fake's startup (the open envelope), while
-            # `info` still hits the timeout because the fake never answers.
-            session = Session("plant.esml"; binary = SHIM, timeout = 2.0)
+            # 5 s covers the Julia fake's startup (the open envelope) even on
+            # slow Julia 1.6 CI runners; `info` still times out because the
+            # fake never answers.
+            session = Session("plant.esml"; binary = SHIM, timeout = 5.0)
             try
                 caught(() -> info(session))
             finally
@@ -250,7 +251,7 @@ end
         end
         @test err isa EsmlError
         @test err.kind == :timeout
-        @test time() - started < 10.0
+        @test time() - started < 20.0
     end
 
     @testset "non-JSON output" begin

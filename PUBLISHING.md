@@ -5,9 +5,9 @@
 
 ## 前提
 
-- `Project.toml` 的 `version` 与 `[compat]` 已定稿（当前 `0.4.0`）；
+- `Project.toml` 的 `version` 与 `[compat]` 已定稿（当前 `0.4.1`）；
 - `Pkg.test()` 通过（协议测试；集成测试需 `MMPROPS_BIN`/`ESML_BIN`）；
-- 仓库已有 tag `v0.4.0`。
+- 仓库已有 tag `v0.4.1`。
 
 ## 推荐路径：JuliaRegistrator
 
@@ -37,8 +37,8 @@
   ```
 - `Versions.toml`
   ```toml
-  ["0.4.0"]
-  git-tree-sha1 = "<git rev-parse v0.4.0^{tree}>"
+  ["0.4.1"]
+  git-tree-sha1 = "<git rev-parse v0.4.1^{tree}>"
   ```
 - `Deps.toml`（JSON3，UUID `0f8b85d8-7281-11e9-16c2-39a750bddbf1`）
 - `Compat.toml`（`julia = "1.6"`、`JSON3 = "1"`）
@@ -49,6 +49,6 @@
 
 ```bash
 julia -e 'using Pkg; Pkg.activate(temp=true);
-          Pkg.add(url="https://github.com/ai4energy/ESMLKit.jl", rev="v0.4.0");
+          Pkg.add(url="https://github.com/ai4energy/ESMLKit.jl", rev="v0.4.1");
           using ESMLKit; println(ESMLKit.engine_version(ESMLKit.find_binary()))'
 ```
