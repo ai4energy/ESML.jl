@@ -1,13 +1,14 @@
 # 注册到 Julia General（准备清单）
 
 当前状态：**未注册**。Julia General 中 `ESMLKit` 为空（2026-11-02 检查）；
-包 UUID 已定稿为 `6fa1d99e-4a66-4af0-9128-1d23b8695e9c`。
+包 UUID 已定稿为 `6fa1d99e-4a66-4af0-9128-1d23b8695e9c`。首个 General
+登记版本定为 **1.0.0**；v0.1.0–v0.4.1 是登记前的开发 tag。
 
 ## 前提
 
-- `Project.toml` 的 `version` 与 `[compat]` 已定稿（当前 `0.4.1`）；
+- `Project.toml` 的 `version` 与 `[compat]` 已定稿（当前 `1.0.0`）；
 - `Pkg.test()` 通过（协议测试；集成测试需 `MMPROPS_BIN`/`ESML_BIN`）；
-- 仓库已有 tag `v0.4.1`。
+- 仓库已有 tag `v1.0.0`。
 
 ## 推荐路径：JuliaRegistrator
 
@@ -37,8 +38,8 @@
   ```
 - `Versions.toml`
   ```toml
-  ["0.4.1"]
-  git-tree-sha1 = "<git rev-parse v0.4.1^{tree}>"
+  ["1.0.0"]
+  git-tree-sha1 = "<git rev-parse v1.0.0^{tree}>"
   ```
 - `Deps.toml`（JSON3，UUID `0f8b85d8-7281-11e9-16c2-39a750bddbf1`）
 - `Compat.toml`（`julia = "1.6"`、`JSON3 = "1"`）
@@ -49,6 +50,6 @@
 
 ```bash
 julia -e 'using Pkg; Pkg.activate(temp=true);
-          Pkg.add(url="https://github.com/ai4energy/ESMLKit.jl", rev="v0.4.1");
+          Pkg.add(url="https://github.com/ai4energy/ESMLKit.jl", rev="v1.0.0");
           using ESMLKit; println(ESMLKit.engine_version(ESMLKit.find_binary()))'
 ```
